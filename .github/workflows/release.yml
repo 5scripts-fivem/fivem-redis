@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Fetch version and message from API
         id: fetch_version
@@ -28,11 +30,37 @@ jobs:
           echo "API_VERSION=$API_VERSION" >> $GITHUB_ENV
           echo "API_MESSAGE=$API_MESSAGE" >> $GITHUB_ENV
 
+      - name: Get Previous Release Tag
+        id: previous_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PREV_TAG=$(gh release list --json tagName --limit 1 | jq -r '.[0].tagName')
+          if [ -z "$PREV_TAG" ] || [ "$PREV_TAG" == "null" ]; then
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "PREV_TAG=$PREV_TAG" >> $GITHUB_ENV
+
+      - name: Get Commit List
+        id: commit_list
+        run: |
+          COMMIT_LOG=$(git log --pretty=format:"- %h %s" ${{ env.PREV_TAG }}..HEAD --invert-grep --grep "chore: update version")
+          if [ -z "$COMMIT_LOG" ]; then
+            COMMIT_LOG="No new commits since last release."
+          fi
+          echo "COMMIT_LOG<<EOF" >> $GITHUB_ENV
+          echo "$COMMIT_LOG" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Generate Compare URL
+        id: compare_url
+        run: |
+          COMPARE_URL="https://github.com/${{ github.repository }}/compare/${{ env.PREV_TAG }}...v${{ env.API_VERSION }}"
+          echo "COMPARE_URL=$COMPARE_URL" >> $GITHUB_ENV
+
       - name: Update fxmanifest.lua
         run: |
-          awk -v new_version="${{ env.API_VERSION }}" \
-                    '{if ($1 == "version") gsub(/[0-9]+\.[0-9]+\.[0-9]+/, new_version); print}' \
-                    fxmanifest.lua > temp.lua && mv temp.lua fxmanifest.lua
+          awk -v new_version="${{ env.API_VERSION }}" '{if ($1 == "version") gsub(/[0-9]+\.[0-9]+\.[0-9]+/, new_version); print}' fxmanifest.lua > temp.lua && mv temp.lua fxmanifest.lua
 
       - name: Update package.json
         run: |
@@ -47,8 +75,6 @@ jobs:
             git add fxmanifest.lua package.json
             git commit -m "chore: update version to ${{ env.API_VERSION }}"
             git push
-          else
-            echo "No changes detected, skipping commit."
           fi
 
       - name: Check if GitHub Release Exists
@@ -95,6 +121,11 @@ jobs:
           body: |
             **Release Notes:**
             ${{ env.API_MESSAGE }}
+
+            **Commits:**
+            ${{ env.COMMIT_LOG }}
+
+            **[Compare v${{ env.PREV_TAG }} - v${{ env.API_VERSION }}](${{ env.COMPARE_URL }})**
           draft: false
           prerelease: false
           files: release/fivem-redis-${{ env.API_VERSION }}.zip

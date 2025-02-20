@@ -30,7 +30,9 @@ jobs:
 
       - name: Update fxmanifest.lua
         run: |
-          sed -i 's/version\s*=\s*["\x27][0-9]\+\.[0-9]\+\.[0-9]\+["\x27]/version = "'"${{ env.API_VERSION }}"'"/' fxmanifest.lua
+          awk -v new_version="${{ env.API_VERSION }}" \
+                    '{if ($1 == "version") gsub(/[0-9]+\.[0-9]+\.[0-9]+/, new_version); print}' \
+                    fxmanifest.lua > temp.lua && mv temp.lua fxmanifest.lua
 
       - name: Update package.json
         run: |

@@ -1,0 +1,23 @@
+{
+  "name": "fivem-redis",
+  "version": "1.0.0",
+  "description": "High performance Redis wrapper for FiveM & RedM.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run clearbuild && npm run typecheck && node build/bundle.js",
+    "clearbuild": "rimraf ./dist",
+    "typecheck": "tsc --noEmit -p server/tsconfig.json",
+    "watch": "npm run clearbuild && cross-env IS_WATCH_MODE=1 node build/bundle.js"
+  },
+  "author": "5scripts.com",
+  "license": "MIT",
+  "dependencies": {
+    "@citizenfx/server": "^2.0.12949-1",
+    "@types/node": "^22.13.4",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.25.0",
+    "ioredis": "^5.5.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3"
+  }
+}

@@ -86,7 +86,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.API_VERSION }}
-          name: Release v${{ env.API_VERSION }}
+          name: v${{ env.API_VERSION }}
           body: "Updated to version ${{ env.API_VERSION }} based on the latest API data."
           draft: false
           prerelease: false

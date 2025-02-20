@@ -125,7 +125,7 @@ jobs:
             **Commits:**
             ${{ env.COMMIT_LOG }}
 
-            **[Compare v${{ env.PREV_TAG }} - v${{ env.API_VERSION }}](${{ env.COMPARE_URL }})**
+            **[Compare ${{ env.PREV_TAG }} - v${{ env.API_VERSION }}](${{ env.COMPARE_URL }})**
           draft: false
           prerelease: false
           files: release/fivem-redis-${{ env.API_VERSION }}.zip

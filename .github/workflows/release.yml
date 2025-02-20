@@ -1,4 +1,4 @@
-name: Node.js resource auto release
+name: Auto-release
 
 on:
   schedule:
@@ -23,7 +23,8 @@ jobs:
         env:
           API_URL: ${{ secrets.API_URL }}
         run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          REPO_NAME="fivem-redis"
+          
           API_RESPONSE=$(curl -s "${API_URL}/${REPO_NAME}/?format=json")
           API_VERSION=$(echo "$API_RESPONSE" | jq -r '.version')
           API_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.message')

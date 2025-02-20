@@ -23,12 +23,14 @@ jobs:
         env:
           API_URL: ${{ secrets.API_URL }}
         run: |
-          API_RESPONSE=$(curl -s "$API_URL${{ github.repository }/?format.json")
+          REPO_NAME=$(basename ${{ github.repository }})
+          API_RESPONSE=$(curl -s "${API_URL}/${REPO_NAME}/?format=json")
           API_VERSION=$(echo "$API_RESPONSE" | jq -r '.version')
           API_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.message')
 
           echo "API_VERSION=$API_VERSION" >> $GITHUB_ENV
           echo "API_MESSAGE=$API_MESSAGE" >> $GITHUB_ENV
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
 
       - name: Get Previous Release Tag
         id: previous_release
@@ -99,18 +101,18 @@ jobs:
       - name: Package the repository
         if: env.RELEASE_EXISTS == 'false'
         run: |
-          rm -rf ${{ github.repository } release
-          mkdir -p ${{ github.repository }
-          rsync -av --progress ./ ${{ github.repository } --exclude node_modules --exclude .git --exclude release
+          rm -rf ${{ env.REPO_NAME }} release
+          mkdir -p ${{ env.REPO_NAME }}
+          rsync -av --progress ./ ${{ env.REPO_NAME }} --exclude node_modules --exclude .git --exclude release
           mkdir -p release
-          zip -r "release/${{ github.repository }-${{ env.API_VERSION }}.zip" ${{ github.repository }
+          zip -r "release/${{ env.REPO_NAME }}-${{ env.API_VERSION }}.zip" ${{ env.REPO_NAME }}
 
       - name: Upload build artifact
         if: env.RELEASE_EXISTS == 'false'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.repository }-${{ env.API_VERSION }}
-          path: release/${{ github.repository }-${{ env.API_VERSION }}.zip
+          name: ${{ env.REPO_NAME }}-${{ env.API_VERSION }}
+          path: release/${{ env.REPO_NAME }}-${{ env.API_VERSION }}.zip
 
       - name: Create GitHub Release
         if: env.RELEASE_EXISTS == 'false'
@@ -128,4 +130,4 @@ jobs:
             **[Compare ${{ env.PREV_TAG }} - v${{ env.API_VERSION }}](${{ env.COMPARE_URL }})**
           draft: false
           prerelease: false
-          files: release/${{ github.repository }-${{ env.API_VERSION }}.zip
+          files: release/${{ env.REPO_NAME }}-${{ env.API_VERSION }}.zip

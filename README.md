@@ -28,7 +28,7 @@ set redis_url "redis://127.0.0.1:6379"
 ```
 
 #### Installing the resource
-Download the [latest release]((https://github.com/5scripts-fivem/fivem-redis/releases/latest)) and save it in your `resources` folder as `fivem-redis` (this is important!)
+Download the [latest release](https://github.com/5scripts-fivem/fivem-redis/releases/latest) and save it in your `resources` folder as `fivem-redis` (this is important!)
 
 #### Setting up the resource
 Open your terminal in the directory of the resource, and run the following commands:

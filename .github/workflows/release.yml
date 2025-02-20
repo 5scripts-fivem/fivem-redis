@@ -2,7 +2,7 @@ name: Auto-Update, Build, and Release
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # Runs every hour
+    - cron: "0 * * * *"  # Runs every hour
   workflow_dispatch:  # Allows manual execution
 
 permissions:
@@ -40,7 +40,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Check if there are any changes before committing
           if [[ -n $(git status --porcelain) ]]; then
             git add fxmanifest.lua package.json
             git commit -m "chore: update version to ${{ env.API_VERSION }}"
@@ -49,40 +48,36 @@ jobs:
             echo "No changes detected, skipping commit."
           fi
 
-      # 🔹 Set up Node.js 22
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
+      - name: Check if GitHub Release Exists
+        id: check_release
+        run: |
+          RELEASES=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases")
+          if echo "$RELEASES" | jq -r '.[].tag_name' | grep -q "v${{ env.API_VERSION }}"; then
+            echo "Release v${{ env.API_VERSION }} already exists. Skipping."
+            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
+          fi
 
-      # 🔹 Install dependencies and build project
-      - name: Install dependencies
-        run: npm install --production
-
-      - name: Build project
-        run: npm run build
-
-      # 🔹 Package the repository inside a "fivem-redis" folder inside the .zip
-      - name: Package the repository
+      # Skip if release exists
+      - name: Build & Package
+        if: env.RELEASE_EXISTS == 'false'
         run: |
           mkdir -p release
           mkdir -p fivem-redis
-          
-          # Copy all files except node_modules
           rsync -av --progress ./ fivem-redis --exclude node_modules --exclude .git
-
-          # Create the zip package
           zip -r "release/fivem-redis-${{ env.API_VERSION }}.zip" fivem-redis
 
-      # 🔹 Upload the zip as an artifact for debugging (Optional)
       - name: Upload build artifact (optional)
+        if: env.RELEASE_EXISTS == 'false'
         uses: actions/upload-artifact@v4
         with:
           name: fivem-redis-${{ env.API_VERSION }}
           path: release/fivem-redis-${{ env.API_VERSION }}.zip
 
-      # 🔹 Create GitHub Release and attach the .zip
       - name: Create GitHub Release
+        if: env.RELEASE_EXISTS == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.API_VERSION }}

@@ -1,0 +1,84 @@
+name: Auto-Update, Build, and Release
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # Runs every hour
+  workflow_dispatch:  # Allows manual execution
+
+jobs:
+  update-build-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch version from API
+        id: fetch_version
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          API_RESPONSE=$(curl -s "$API_URL")
+          API_VERSION=$(echo "$API_RESPONSE" | jq -r '.version')
+
+          echo "Fetched API version: $API_VERSION"
+          echo "API_VERSION=$API_VERSION" >> $GITHUB_ENV
+
+      - name: Update fxmanifest.lua
+        run: |
+          sed -i 's/version\s*=\s*["\x27][0-9]\+\.[0-9]\+\.[0-9]\+["\x27]/version = "'"${{ env.API_VERSION }}"'"/' fxmanifest.lua
+
+      - name: Update package.json
+        run: |
+          jq '.version = "${{ env.API_VERSION }}"' package.json > temp.json && mv temp.json package.json
+
+      - name: Commit updated files
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add fxmanifest.lua package.json
+          git commit -m "chore: update version to ${{ env.API_VERSION }}"
+          git push
+
+      # 🔹 Set up Node.js 22
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # 🔹 Install dependencies and build project
+      - name: Install dependencies
+        run: npm install --production
+
+      - name: Build project
+        run: npm run build
+
+      # 🔹 Package the repository inside a "fivem-redis" folder inside the .zip
+      - name: Package the repository
+        run: |
+          mkdir -p release
+          mkdir -p fivem-redis
+          
+          # Copy all files except node_modules
+          rsync -av --progress ./ fivem-redis --exclude node_modules --exclude .git
+
+          # Create the zip package
+          zip -r "release/fivem-redis-${{ env.API_VERSION }}.zip" fivem-redis
+
+      # 🔹 Upload the zip as an artifact for debugging (Optional)
+      - name: Upload build artifact (optional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: fivem-redis-${{ env.API_VERSION }}
+          path: release/fivem-redis-${{ env.API_VERSION }}.zip
+
+      # 🔹 Create GitHub Release and attach the .zip
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.API_VERSION }}
+          release_name: Release v${{ env.API_VERSION }}
+          body: "Updated to version ${{ env.API_VERSION }} based on the latest API data."
+          draft: false
+          prerelease: false
+          files: release/fivem-redis-${{ env.API_VERSION }}.zip

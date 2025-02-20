@@ -74,7 +74,7 @@ jobs:
           rsync -av --progress ./ fivem-redis --exclude node_modules --exclude .git --exclude release
           mkdir -p release
           cd fivem-redis
-          zip -r "../release/fivem-redis-${{ env.API_VERSION }}.zip" .
+          zip -r "../release/fivem-redis.zip" .
           cd ..
 
 

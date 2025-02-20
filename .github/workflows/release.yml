@@ -5,6 +5,9 @@ on:
     - cron: "*/30 * * * *"  # Runs every hour
   workflow_dispatch:  # Allows manual execution
 
+permissions:
+  contents: write
+
 jobs:
   update-build-release:
     runs-on: ubuntu-latest
@@ -83,7 +86,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ env.API_VERSION }}
-          release_name: Release v${{ env.API_VERSION }}
+          name: Release v${{ env.API_VERSION }}
           body: "Updated to version ${{ env.API_VERSION }} based on the latest API data."
           draft: false
           prerelease: false

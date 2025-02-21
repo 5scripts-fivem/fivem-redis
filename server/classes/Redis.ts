@@ -25,6 +25,13 @@ export default class Redis {
     }
 
     /**
+     * Clears all keys in the database.
+     */
+    async flushAllKeys(): Promise<void> {
+        await this.redisClient.flushall();
+    }
+
+    /**
      * Checks if Redis client status is ready.
      * @returns {boolean} Whether the Redis client is ready or not
      */

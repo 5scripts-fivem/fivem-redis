@@ -1,5 +1,9 @@
+if GetConvar('redis_benchmarkLua', '0') ~= '1' then
+    return
+end
+
 warn('Benchmarking is enabled, you can turn it off in fivem-redis/benchmark.lua')
-local iterations = 20000
+local iterations = GetConvarInt('redis_benchmarkIterations', 10000)
 beginClock, endClock = 0, 0
 
 function printResults(title)
@@ -81,12 +85,18 @@ redis.onReady(function()
     Wait(1000)
 
     warn('Benchmarking is enabled, you can turn it off in fivem-redis/benchmark.lua')
+    -- Flushing all keys before
+    redis.flushAllKeys()
 
     print('======')
     print('Starting the benchmark with ' .. iterations .. ' iterations.')
     print('======')
     for index=1, #benchmarks do
         local data = benchmarks[index]
+        if data.label:find('all from list') and iterations > 100000 then
+            warn('Skipping the '..data.label..' benchmark. Too long to finish.')
+            goto skip
+        end
         local fun = data.fun
         local label = data.label
         print('======')
@@ -97,6 +107,8 @@ redis.onReady(function()
             fun(i)
         end
         printResults(label)
+
+        ::skip::
     end
 
     print(' ')

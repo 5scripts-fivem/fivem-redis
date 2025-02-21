@@ -17,8 +17,10 @@ server_scripts {
     'dist/**.js',
 
     --- Benchmark files
-    -- 'lib.lua',
-    -- 'benchmark.lua',
+    --- Add following line: `set redis_benchmarkJs 1` or `set redis_benchmarkLua 1` to your server.cfg in order to run benchmarks.
+    --- You can set the amount of iterations using `set redis_benchmarkIterations 10000`.
+    'lib.lua',
+    'benchmark.lua',
 }
 
 dependencies {

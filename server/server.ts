@@ -1,5 +1,6 @@
 import Redis from './classes/Redis';
 import { err } from './loggers/logger';
+import { prepareBenchmarks } from './tests/benchmark';
 
 export const redisInstance = new Redis({url: GetConvar('redis_url', 'redis://127.0.0.1:6379')});
 
@@ -25,3 +26,5 @@ methodNames.forEach((method) => {
         }
     });
 });
+
+prepareBenchmarks();

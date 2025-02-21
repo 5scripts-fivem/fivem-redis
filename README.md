@@ -83,6 +83,9 @@ end)
 
 #### CRUD Operations
 ```lua
+-- Delete all stored keys, with their values.
+redis.flushAllKeys()
+
 redis.set.await('setKey', 'value')
 
 redis.setTemporary.await('temporaryKey', 'value', 5000 --[[expiration, defaults to 5000ms]])
@@ -122,6 +125,39 @@ redis.releaseLock.await('myLock')
 redis.releaseLockForPlayer.await('myLock', 1)
 ```
 
+## 💨 Benchmarking
+We tested our library in both JavaScript environment, and Lua.
+Lua is noticably slower, because of overhead caused by FiveM's events.
+
+10 000 iterations
+| Test                     | JavaScript | Lua    |
+|--------------------------|------------|--------|
+| Setting values           | 343ms      | 3.44s  |
+| Retrieving values        | 228ms      | 2.88s  |
+| Deleting values          | 193ms      | 2.76s  |
+| Incrementing values      | 246ms      | 3.62s  |
+| Decrementing values      | 229ms      | 2.34s  |
+| Pushing to list          | 249ms      | 3.06s  |
+| Retrieving all from list | 14.63s     | 48.46s |
+| Popping from list        | 333ms      | 2.36s  |
+
+1 000 000 iterations
+| Test                     | JavaScript | Lua     |
+|--------------------------|------------|---------|
+| Setting values           | 30.70s     | 301.82s |
+| Retrieving values        | 29.09s     | 287.60s |
+| Deleting values          | 30.62s     | DNF     |
+| Incrementing values      | 30.02s     | DNF     |
+| Decrementing values      | 30.70s     | DNF     |
+| Pushing to list          | 29.61s     | DNF     |
+| Retrieving all from list | SKIPPED    | SKIPPED |
+| Popping from list        | 26.72s     | DNF     |
+
+Why did Lua not finish the 1 000 000 iterations test?
+
+As said before, FiveM has a major overhead using exports (basically events), and running a lot of operations at once doesn't help it.
+
+Even though Lua didn't finish our tests, it's perfectly fine, fast and reliable in normal use.
 
 ## Notice
 We provided a `.yarn.installed` file, as a workaround for FiveM's resource `yarn` not utilizing the newer version of Node - 22.

@@ -30,7 +30,9 @@ jobs:
           API_MESSAGE=$(echo "$API_RESPONSE" | jq -r '.message')
 
           echo "API_VERSION=$API_VERSION" >> $GITHUB_ENV
-          echo "API_MESSAGE=$API_MESSAGE" >> $GITHUB_ENV
+          echo "API_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$API_MESSAGE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
 
       - name: Get Previous Release Tag

@@ -121,6 +121,7 @@ else
     print('Failed to acquire lock')
 end
 
+-- Try to acquire a lock for a player of source 1
 if redis.tryToAcquireLockForPlayer.await('myLock', 1, 5000) then
     print('Acquired lock for a player')
 else
@@ -128,6 +129,7 @@ else
 end
 
 redis.releaseLock.await('myLock')
+-- Release the lock for a player of source 1
 redis.releaseLockForPlayer.await('myLock', 1)
 ```
 

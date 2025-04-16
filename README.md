@@ -15,7 +15,7 @@ FiveM/RedM resource allowing usage of Redis in Lua resources using [ioredis](htt
 [📞 Discord](https://discord.gg/5scripts)
 
 ## Dependencies
-Our resource doesn't depend on any external resources, but to use our version checking download [5s_lib](https://dummy.url)
+Our resource doesn't depend on any external resources, but if you bought one of our resources you get to access the version checking provided by our **5s_lib** supplied with every bought resource.
 
 Also, to run our resource you will need to have installed newest artifacts (12913 and up) to support Node 22:
 [Windows](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master)

@@ -4,9 +4,9 @@ FiveM/RedM resource allowing usage of Redis in Lua resources using [ioredis](htt
 
 ## Who are We?
 
-🚀 5scripts is a development team specializing in high-quality FiveM scripts and resources. Our passion for creating innovative solutions has made us a trusted name in the FiveM community.
+🚀 [5scripts](https://5scripts.com) is a development team specializing in high-quality FiveM scripts and resources. Our passion for creating innovative solutions has made us a trusted name in the FiveM community.
 
-[🛒 Visit our store](https://5scripts.com) to explore our complete collection of premium FiveM scripts designed to enhance your server experience!
+🛒 To explore our complete collection of premium FiveM scripts - [Visit our store](https://5scripts.com)!
 
 ## 🔗 Shortcuts
 

@@ -6,7 +6,6 @@ description 'High performance Redis wrapper for FiveM & RedM.'
 version '1.0.2'
 
 lua54 'yes'
-node_version '22'
 
 server_scripts {
     --- Optional for version checking, recommended to leave.
@@ -24,6 +23,5 @@ server_scripts {
 }
 
 dependencies {
-    -- Node 22
-    '/server:12913',
+    '/server:7290',
 }

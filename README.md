@@ -17,11 +17,6 @@ FiveM/RedM resource allowing usage of Redis in Lua resources using [ioredis](htt
 ## Dependencies
 Our resource doesn't depend on any external resources, but if you bought one of our resources you get to access the version checking provided by our **5s_lib** supplied with every bought resource.
 
-Also, to run our resource you will need to have installed newest artifacts (12913 and up) to support Node 22:
-[Windows](https://runtime.fivem.net/artifacts/fivem/build_server_windows/master)
-
-[Linux](https://runtime.fivem.net/artifacts/fivem/build_proot_linux/master)
-
 ## 📁 Setup
 
 #### Redis instance
@@ -168,4 +163,4 @@ As said before, FiveM has a major overhead using exports (basically events), and
 Even though Lua didn't finish our tests, it's perfectly fine, fast and reliable in normal use.
 
 ## Notice
-We provided a `.yarn.installed` file, as a workaround for FiveM's resource `yarn` not utilizing the newer version of Node - 22.
+We provided a `.yarn.installed` file, as a workaround for FiveM's resource `yarn` sometimes being fuzzy with newer npm packages.

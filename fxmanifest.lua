@@ -3,7 +3,7 @@ games {'gta5', 'rdr3'}
 
 author '5scripts.com'
 description 'High performance Redis wrapper for FiveM & RedM.'
-version '1.0.2'
+version '1.0.3'
 
 lua54 'yes'
 
